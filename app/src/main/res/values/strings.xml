@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">FlexiTime</string>
-    <string name="das_ist_ein_button">Das ist ein Button</string>
+    <string name="zeitstempel">Zeitstempel</string>
+    <string name="exit">Exit</string>
+    <string name="tv_timestamp_kommen">Kommen:</string>
 </resources>
