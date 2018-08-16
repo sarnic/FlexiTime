@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">FlexiTime</string>
-    <string name="zeitstempel">Zeitstempel</string>
+    <string name="zeitstempel_kommen">Kommen</string>
+    <string name="zeitstempel_pause">Pause</string>
+    <string name="zeitstempel_gehen">Gehen</string>
     <string name="exit">Exit</string>
     <string name="tv_timestamp_kommen">Kommen:</string>
+    <string name="tv_timestamp_gehen">Gehen:</string>
+    <string name="tv_timestamp_pause">Pause:</string>
 </resources>
