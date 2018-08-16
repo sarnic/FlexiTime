@@ -78,13 +78,19 @@ public class MainActivity extends AppCompatActivity {
 
         DigitalClock dc = (DigitalClock) findViewById(R.id.digitalClock1);
 
-    }
+        Button btnSave = (Button) findViewById(R.id.btn_Save);
+        btnSave.setOnClickListener(new View.OnClickListener() {
 
-    /**
-     * Called when the user touches the button
-     */
-    public void sendMessage(View view) {
-        // Do something in response to button click
+            @Override
+            public void onClick(View view) {
 
+                TextView tvTimestamp = (TextView) findViewById(R.id.tv_timestamp);
+                Date currentTime = Calendar.getInstance().getTime();
+                SimpleDateFormat simpleDate =  new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                String strDt = simpleDate.format(currentTime);
+                tvTimestamp.setText(strDt);
+
+            }
+        });
     }
 }
