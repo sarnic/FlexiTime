@@ -15,19 +15,31 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    boolean isKommen = false;
-    boolean isPause = false;
-    boolean isGehen = false;
+    boolean isKommen, isPauseAnfang, isPauseEnde, isGehen;
+    Button btnExit, btnTimeStampKommen, btnTimeStampPause, btnTimeStampGehen;
+    DigitalClock digitalClock;
+    TextView tvTimestampKommen, tvTimestampPauseAnfang, tvTimestampPauseEnde, tvTimestampGehen;
+    Date currentTime;
+    SimpleDateFormat sdfDatumUhrzeit, sdfUhrzeit;
+    String strDt;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initializeVariables();
 
-        DigitalClock dc = (DigitalClock) findViewById(R.id.digitalClock1);
+        isKommen = false;
+        isPauseAnfang = false;
+        isPauseEnde = false;
+        isGehen = false;
+        btnTimeStampPause.setEnabled(false);
+        btnTimeStampGehen.setEnabled(false);
+        sdfDatumUhrzeit =  new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        sdfUhrzeit =  new SimpleDateFormat("HH:mm:ss");
+        digitalClock = (DigitalClock) findViewById(R.id.digitalClock1);
 
-        Button btnExit = (Button) findViewById(R.id.btn_exit);
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -57,56 +69,72 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final Button btnTimeStampKommen = (Button) findViewById(R.id.btn_timestamp_kommen);
-
+        //Kommen-Stempel
         btnTimeStampKommen.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-
-                TextView tvTimestamp = (TextView) findViewById(R.id.tv_timestamp_kommenzeit);
-                Date currentTime = Calendar.getInstance().getTime();
-                SimpleDateFormat simpleDate =  new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                String strDt = simpleDate.format(currentTime);
-                tvTimestamp.setText(strDt);
-                isKommen = true;
+                if (isKommen == false){
+                    isKommen = true;
+                    currentTime = Calendar.getInstance().getTime();
+                    strDt = sdfDatumUhrzeit.format(currentTime);
+                    tvTimestampKommen.setText(strDt);
+                    btnTimeStampPause.setEnabled(true);
+                    btnTimeStampGehen.setEnabled(true);
+                    btnTimeStampKommen.setEnabled(false);
+                }
             }
         });
 
-        final Button btnTimeStampPause = (Button) findViewById(R.id.btn_timestamp_pause);
-        btnTimeStampPause.setEnabled(false);
+        //Pause-Stempel
         btnTimeStampPause.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-/*                if (isKommen == false) {
-                    btnTimeStampPause.setEnabled(false);
+                if (isPauseEnde == false) {
+                    if (isPauseAnfang == true){
+                        isPauseEnde = true;
+                        currentTime = Calendar.getInstance().getTime();
+                        strDt = sdfUhrzeit.format(currentTime);
+                        tvTimestampPauseEnde.setText(strDt);
+                        btnTimeStampPause.setEnabled(false);
+                    }
+                    else {
+                        isPauseAnfang = true;
+                        currentTime = Calendar.getInstance().getTime();
+                        strDt = sdfDatumUhrzeit.format(currentTime);
+                        tvTimestampPauseAnfang.setText(strDt);
+                    }
                 }
-                else {
-                    btnTimeStampPause.setEnabled(true);
-                }*/
-
-                TextView tvTimestamp = (TextView) findViewById(R.id.tv_timestamp_pausenzeit);
-                Date currentTime = Calendar.getInstance().getTime();
-                SimpleDateFormat simpleDate =  new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                String strDt = simpleDate.format(currentTime);
-                tvTimestamp.setText(strDt);
-                isPause = true;
             }
         });
 
-        Button btnTimeStampGehen = (Button) findViewById(R.id.btn_timestamp_gehen);
+        //Gehen-Stempel
         btnTimeStampGehen.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-
-                TextView tvTimestamp = (TextView) findViewById(R.id.tv_timestamp_gehenzeit);
-                Date currentTime = Calendar.getInstance().getTime();
-                SimpleDateFormat simpleDate =  new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                String strDt = simpleDate.format(currentTime);
-                tvTimestamp.setText(strDt);
-                isGehen = true;
+                if (isKommen == true){
+                    isGehen = true;
+                    currentTime = Calendar.getInstance().getTime();
+                    strDt = sdfDatumUhrzeit.format(currentTime);
+                    tvTimestampGehen.setText(strDt);
+                    btnTimeStampGehen.setEnabled(false);
+                }
             }
         });
+    }
+
+    private void initializeVariables(){
+
+        tvTimestampKommen = (TextView) findViewById(R.id.tv_timestamp_kommenzeit);
+        tvTimestampPauseAnfang = (TextView) findViewById(R.id.tv_timestamp_pausenzeit_anfang);
+        tvTimestampPauseEnde = (TextView) findViewById(R.id.tv_timestamp_pausenzeit_ende);
+        tvTimestampGehen = (TextView) findViewById(R.id.tv_timestamp_gehenzeit);
+        btnTimeStampKommen = (Button) findViewById(R.id.btn_timestamp_kommen);
+        btnTimeStampPause = (Button) findViewById(R.id.btn_timestamp_pause);
+        btnTimeStampGehen = (Button) findViewById(R.id.btn_timestamp_gehen);
+        btnExit = (Button) findViewById(R.id.btn_exit);
+
     }
 }
