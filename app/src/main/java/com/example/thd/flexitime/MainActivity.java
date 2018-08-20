@@ -18,10 +18,10 @@ public class MainActivity extends AppCompatActivity {
     boolean isKommen, isPauseAnfang, isPauseEnde, isGehen;
     Button btnExit, btnTimeStampKommen, btnTimeStampPause, btnTimeStampGehen;
     DigitalClock digitalClock;
-    TextView tvTimestampKommen, tvTimestampPauseAnfang, tvTimestampPauseEnde, tvTimestampGehen;
+    TextView tvTimestampKommen, tvTimestampPauseAnfang, tvTimestampPauseEnde, tvTimestampGehen, tvTimestampDatum;
     Date currentTime;
-    SimpleDateFormat sdfDatumUhrzeit, sdfUhrzeit;
-    String strDt;
+    SimpleDateFormat sdfDatumUhrzeit, sdfDatum, sdfUhrzeit;
+    String strDateTime, strDate, strTime;
 
 
     @Override
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         btnTimeStampPause.setEnabled(false);
         btnTimeStampGehen.setEnabled(false);
         sdfDatumUhrzeit =  new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        sdfDatum = new SimpleDateFormat("dd.MM.yyyy");
         sdfUhrzeit =  new SimpleDateFormat("HH:mm:ss");
         digitalClock = (DigitalClock) findViewById(R.id.digitalClock1);
 
@@ -77,8 +78,10 @@ public class MainActivity extends AppCompatActivity {
                 if (isKommen == false){
                     isKommen = true;
                     currentTime = Calendar.getInstance().getTime();
-                    strDt = sdfDatumUhrzeit.format(currentTime);
-                    tvTimestampKommen.setText(strDt);
+                    strTime = sdfUhrzeit.format(currentTime);
+                    strDate = sdfDatum.format(currentTime);
+                    tvTimestampKommen.setText(strTime);
+                    tvTimestampDatum.setText(strDate);
                     btnTimeStampPause.setEnabled(true);
                     btnTimeStampGehen.setEnabled(true);
                     btnTimeStampKommen.setEnabled(false);
@@ -95,15 +98,15 @@ public class MainActivity extends AppCompatActivity {
                     if (isPauseAnfang == true){
                         isPauseEnde = true;
                         currentTime = Calendar.getInstance().getTime();
-                        strDt = sdfUhrzeit.format(currentTime);
-                        tvTimestampPauseEnde.setText(strDt);
+                        strDateTime = sdfUhrzeit.format(currentTime);
+                        tvTimestampPauseEnde.setText(strDateTime);
                         btnTimeStampPause.setEnabled(false);
                     }
                     else {
                         isPauseAnfang = true;
                         currentTime = Calendar.getInstance().getTime();
-                        strDt = sdfDatumUhrzeit.format(currentTime);
-                        tvTimestampPauseAnfang.setText(strDt);
+                        strDateTime = sdfDatumUhrzeit.format(currentTime);
+                        tvTimestampPauseAnfang.setText(strDateTime);
                     }
                 }
             }
@@ -117,8 +120,8 @@ public class MainActivity extends AppCompatActivity {
                 if (isKommen == true){
                     isGehen = true;
                     currentTime = Calendar.getInstance().getTime();
-                    strDt = sdfDatumUhrzeit.format(currentTime);
-                    tvTimestampGehen.setText(strDt);
+                    strDateTime = sdfDatumUhrzeit.format(currentTime);
+                    tvTimestampGehen.setText(strDateTime);
                     btnTimeStampGehen.setEnabled(false);
                 }
             }
