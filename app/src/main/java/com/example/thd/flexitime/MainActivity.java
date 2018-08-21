@@ -1,6 +1,8 @@
 package com.example.thd.flexitime;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -9,19 +11,22 @@ import android.widget.Button;
 import android.widget.DigitalClock;
 import android.widget.TextView;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
     boolean isKommen, isPauseAnfang, isPauseEnde, isGehen;
+    long diffInMillies, plusminusInMillies;
     Button btnExit, btnTimeStampKommen, btnTimeStampPause, btnTimeStampGehen;
     DigitalClock digitalClock;
-    TextView tvTimestampKommen, tvTimestampPauseAnfang, tvTimestampPauseEnde, tvTimestampPauseDifferenz, tvTimestampGehen, tvTimestampDatum;
-    Date currentTime;
+    TextView tvTimestampKommen, tvTimestampPauseAnfang, tvTimestampPauseEnde, tvTimestampPauseDifferenz, tvTimestampGehen, tvTimestampDatum, tvTimestampTotalzeitAnfang, tvTimestampTotalzeitEnde, tvTimestampTotalzeit, tvTimestampTotalPlusminus;
+    Date dtCurrentTimeKommen, dtCurrentTimeGehen, dtCurrentTimePauseAnfang, dtCurrentTimePauseEnde;
     SimpleDateFormat sdfDatumUhrzeit, sdfDatum, sdfUhrzeit;
-    String strDate, strTime;
+    String strDate, strTime, strDif;
 
 
     @Override
@@ -36,10 +41,10 @@ public class MainActivity extends AppCompatActivity {
         isGehen = false;
         btnTimeStampPause.setEnabled(false);
         btnTimeStampGehen.setEnabled(false);
-        sdfDatumUhrzeit =  new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        sdfDatumUhrzeit = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         sdfDatum = new SimpleDateFormat("dd.MM.yyyy");
-        sdfUhrzeit =  new SimpleDateFormat("HH:mm:ss");
-        digitalClock = (DigitalClock) findViewById(R.id.digitalClock1);
+        sdfUhrzeit = new SimpleDateFormat("HH:mm:ss");
+        digitalClock = findViewById(R.id.digitalClock1);
 
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,13 +80,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                if (isKommen == false){
+                if (isKommen == false) {
                     isKommen = true;
-                    currentTime = Calendar.getInstance().getTime();
-                    strTime = sdfUhrzeit.format(currentTime);
-                    strDate = sdfDatum.format(currentTime);
+                    dtCurrentTimeKommen = Calendar.getInstance().getTime();
+                    strTime = sdfUhrzeit.format(dtCurrentTimeKommen);
+                    strDate = sdfDatum.format(dtCurrentTimeKommen);
                     tvTimestampKommen.setText(strTime);
                     tvTimestampDatum.setText(strDate);
+                    tvTimestampTotalzeitAnfang.setText(strTime);
                     btnTimeStampPause.setEnabled(true);
                     btnTimeStampGehen.setEnabled(true);
                     btnTimeStampKommen.setEnabled(false);
@@ -92,20 +98,31 @@ public class MainActivity extends AppCompatActivity {
         //Pause-Stempel
         btnTimeStampPause.setOnClickListener(new View.OnClickListener() {
 
+            @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View view) {
                 if (isPauseEnde == false) {
-                    if (isPauseAnfang == true){
+                    if (isPauseAnfang == true) {
                         isPauseEnde = true;
-                        currentTime = Calendar.getInstance().getTime();
-                        strTime = sdfUhrzeit.format(currentTime);
+                        dtCurrentTimePauseEnde = Calendar.getInstance().getTime();
+                        strTime = sdfUhrzeit.format(dtCurrentTimePauseEnde);
                         tvTimestampPauseEnde.setText(strTime);
+                        diffInMillies = Math.abs(dtCurrentTimePauseEnde.getTime() - dtCurrentTimePauseAnfang.getTime());
+
+                        tvTimestampPauseDifferenz.setText(String.format("%02d:%02d:%02d",
+                                TimeUnit.MILLISECONDS.toHours(diffInMillies),
+                                TimeUnit.MILLISECONDS.toMinutes(diffInMillies) -
+                                        TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(diffInMillies)),
+                                TimeUnit.MILLISECONDS.toSeconds(diffInMillies) -
+                                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(diffInMillies))
+                        ));
+
+
                         btnTimeStampPause.setEnabled(false);
-                    }
-                    else {
+                    } else {
                         isPauseAnfang = true;
-                        currentTime = Calendar.getInstance().getTime();
-                        strTime = sdfUhrzeit.format(currentTime);
+                        dtCurrentTimePauseAnfang = Calendar.getInstance().getTime();
+                        strTime = sdfUhrzeit.format(dtCurrentTimePauseAnfang);
                         tvTimestampPauseAnfang.setText(strTime);
                     }
                 }
@@ -117,29 +134,61 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                if (isKommen == true){
+                if (isKommen == true) {
                     isGehen = true;
-                    currentTime = Calendar.getInstance().getTime();
-                    strTime = sdfUhrzeit.format(currentTime);
+                    dtCurrentTimeGehen = Calendar.getInstance().getTime();
+                    strTime = sdfUhrzeit.format(dtCurrentTimeGehen);
                     tvTimestampGehen.setText(strTime);
+                    tvTimestampTotalzeitEnde.setText(strTime);
+
+                    diffInMillies = Math.abs(dtCurrentTimeKommen.getTime() - dtCurrentTimeGehen.getTime());
+
+                    tvTimestampTotalzeit.setText(String.format("%02d:%02d:%02d",
+                            TimeUnit.MILLISECONDS.toHours(diffInMillies),
+                            TimeUnit.MILLISECONDS.toMinutes(diffInMillies) -
+                                    TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(diffInMillies)),
+                            TimeUnit.MILLISECONDS.toSeconds(diffInMillies) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(diffInMillies))
+                    ));
+
+                    //Regelarbeitszeit von 8,5h pro Tag inkl. 30 Minuten Pause
+                    plusminusInMillies = diffInMillies - 30600000;
+
+                    tvTimestampTotalPlusminus.setText(String.format("%02d:%02d:%02d",
+                            TimeUnit.MILLISECONDS.toHours(plusminusInMillies),
+                            TimeUnit.MILLISECONDS.toMinutes(plusminusInMillies) -
+                                    TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(plusminusInMillies)),
+                            TimeUnit.MILLISECONDS.toSeconds(plusminusInMillies) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(plusminusInMillies))
+                    ));
+
+                    if (plusminusInMillies < 0){
+                        tvTimestampTotalPlusminus.setTextColor(Color.rgb(200,0,0));
+                    }
+
+
                     btnTimeStampGehen.setEnabled(false);
                 }
             }
         });
     }
 
-    private void initializeVariables(){
+    private void initializeVariables() {
 
-        tvTimestampKommen = (TextView) findViewById(R.id.tv_timestamp_kommenzeit);
-        tvTimestampPauseAnfang = (TextView) findViewById(R.id.tv_timestamp_pausenzeit_anfang);
-        tvTimestampPauseEnde = (TextView) findViewById(R.id.tv_timestamp_pausenzeit_ende);
-        tvTimestampPauseDifferenz = (TextView) findViewById(R.id.tv_timestamp_pausenzeit_differenz);
-        tvTimestampGehen = (TextView) findViewById(R.id.tv_timestamp_gehenzeit);
-        tvTimestampDatum = (TextView) findViewById(R.id.tv_timestamp_date_day);
-        btnTimeStampKommen = (Button) findViewById(R.id.btn_timestamp_kommen);
-        btnTimeStampPause = (Button) findViewById(R.id.btn_timestamp_pause);
-        btnTimeStampGehen = (Button) findViewById(R.id.btn_timestamp_gehen);
-        btnExit = (Button) findViewById(R.id.btn_exit);
+        tvTimestampKommen = findViewById(R.id.tv_timestamp_kommenzeit);
+        tvTimestampPauseAnfang = findViewById(R.id.tv_timestamp_pausenzeit_anfang);
+        tvTimestampPauseEnde = findViewById(R.id.tv_timestamp_pausenzeit_ende);
+        tvTimestampPauseDifferenz = findViewById(R.id.tv_timestamp_pausenzeit_differenz);
+        tvTimestampGehen = findViewById(R.id.tv_timestamp_gehenzeit);
+        tvTimestampDatum = findViewById(R.id.tv_timestamp_date_day);
+        tvTimestampTotalzeitAnfang = findViewById(R.id.tv_timestamp_totalzeit_anfang);
+        tvTimestampTotalzeitEnde = findViewById(R.id.tv_timestamp_totalzeit_ende);
+        tvTimestampTotalzeit = findViewById(R.id.tv_timestamp_totalzeit);
+        tvTimestampTotalPlusminus = findViewById(R.id.tv_timestamp_total_plusminus);
+        btnTimeStampKommen = findViewById(R.id.btn_timestamp_kommen);
+        btnTimeStampPause = findViewById(R.id.btn_timestamp_pause);
+        btnTimeStampGehen = findViewById(R.id.btn_timestamp_gehen);
+        btnExit = findViewById(R.id.btn_exit);
 
     }
 }

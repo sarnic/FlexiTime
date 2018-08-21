@@ -9,4 +9,5 @@
     <string name="tv_timestamp_pause">Pause:</string>
     <string name="Platzhalter">XXXXXX</string>
     <string name="tv_timestamp_lblDate">Datum:</string>
+    <string name="tv_timestamp_total">Total:</string>
 </resources>
