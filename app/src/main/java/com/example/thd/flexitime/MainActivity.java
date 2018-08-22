@@ -1,6 +1,7 @@
 package com.example.thd.flexitime;
 
 import android.annotation.SuppressLint;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DigitalClock;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     Date dtCurrentTimeKommen, dtCurrentTimeGehen, dtCurrentTimePauseAnfang, dtCurrentTimePauseEnde;
     SimpleDateFormat sdfDatumUhrzeit, sdfDatum, sdfUhrzeit;
     String strDate, strTime, strDif;
+    TimePicker picker;
 
 
     @Override
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         sdfDatum = new SimpleDateFormat("dd.MM.yyyy");
         sdfUhrzeit = new SimpleDateFormat("HH:mm:ss");
         digitalClock = findViewById(R.id.digitalClock1);
+        picker.setIs24HourView(true);
 
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +99,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+         btnTimeStampKommen.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                Calendar mcurrentTime = Calendar.getInstance();
+                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = mcurrentTime.get(Calendar.MINUTE);
+                TimePickerDialog mTimePicker;
+                mTimePicker = new TimePickerDialog(MainActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        tvTimestampKommen.setText(selectedHour + ":" + selectedMinute);
+                    }
+                }, hour, minute, true);//Yes 24 hour time
+                mTimePicker.setTitle("Select Time");
+                mTimePicker.show();
+
+
+                return true;
+            }
+        });
+
         //Pause-Stempel
         btnTimeStampPause.setOnClickListener(new View.OnClickListener() {
 
@@ -107,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                         dtCurrentTimePauseEnde = Calendar.getInstance().getTime();
                         strTime = sdfUhrzeit.format(dtCurrentTimePauseEnde);
                         tvTimestampPauseEnde.setText(strTime);
-                        diffInMillies = Math.abs(dtCurrentTimePauseEnde.getTime() - dtCurrentTimePauseAnfang.getTime());
+                        diffInMillies = Math.abs(dtCurrentTimePauseAnfang.getTime() - dtCurrentTimePauseEnde.getTime());
 
                         tvTimestampPauseDifferenz.setText(String.format("%02d:%02d:%02d",
                                 TimeUnit.MILLISECONDS.toHours(diffInMillies),
@@ -151,15 +177,15 @@ public class MainActivity extends AppCompatActivity {
                                     TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(diffInMillies))
                     ));
 
-                    //Regelarbeitszeit von 8,5h pro Tag inkl. 30 Minuten Pause
+                    //Regelarbeitszeit von 8,5h pro Tag inkl. 30 Minuten Pause = 8,5*3600*1000
                     plusminusInMillies = diffInMillies - 30600000;
 
                     tvTimestampTotalPlusminus.setText(String.format("%02d:%02d:%02d",
                             TimeUnit.MILLISECONDS.toHours(plusminusInMillies),
-                            TimeUnit.MILLISECONDS.toMinutes(plusminusInMillies) -
-                                    TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(plusminusInMillies)),
-                            TimeUnit.MILLISECONDS.toSeconds(plusminusInMillies) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(plusminusInMillies))
+                            TimeUnit.MILLISECONDS.toMinutes(Math.abs(plusminusInMillies)) -
+                                    TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(Math.abs(plusminusInMillies))),
+                            TimeUnit.MILLISECONDS.toSeconds(Math.abs(plusminusInMillies)) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(Math.abs(plusminusInMillies)))
                     ));
 
                     if (plusminusInMillies < 0){
