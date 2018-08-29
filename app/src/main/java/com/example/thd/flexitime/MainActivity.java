@@ -15,6 +15,7 @@ import android.widget.DigitalClock;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         sdfUhrzeit = new SimpleDateFormat("HH:mm:ss");
         digitalClock = findViewById(R.id.digitalClock1);
 
-
+        //Exit
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,37 +104,66 @@ public class MainActivity extends AppCompatActivity {
          btnTimeStampKommen.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                if (isKommen == false) {
+                    isKommen = true;
+                    Calendar mcurrentTime = Calendar.getInstance();
+                    int day = mcurrentTime.get(Calendar.DAY_OF_MONTH);
+                    int month = mcurrentTime.get(Calendar.MONTH);
+                    int year = mcurrentTime.get(Calendar.YEAR);
+                    int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                    int minute = mcurrentTime.get(Calendar.MINUTE);
 
-                Calendar mcurrentTime = Calendar.getInstance();
-                int day = mcurrentTime.get(Calendar.DAY_OF_MONTH);
-                int month = mcurrentTime.get(Calendar.MONTH);
-                int year = mcurrentTime.get(Calendar.YEAR);
-                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = mcurrentTime.get(Calendar.MINUTE);
+                    DatePickerDialog mDatePicker;
+                    mDatePicker = new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker datePicker, int selectedYear, int selectedMonth, int selectedDay) {
+                            if (selectedMonth < 10 || selectedDay < 10) {
+                                if (selectedMonth < 10 && selectedDay >= 10) {
+                                    tvTimestampDatum.setText(selectedDay + ".0" + (selectedMonth + 1) + "." + selectedYear);
+                                }
+                                if (selectedDay < 10 && selectedMonth >= 10) {
+                                    tvTimestampDatum.setText("0" + selectedDay + "." + (selectedMonth + 1) + "." + selectedYear);
+                                }
+                                if (selectedMonth < 10 && selectedDay < 10) {
+                                    tvTimestampDatum.setText("0" + selectedDay + ".0" + (selectedMonth + 1) + "." + selectedYear);
+                                }
+                            } else {
+                                tvTimestampDatum.setText(selectedDay + "." + (selectedMonth + 1) + "." + selectedYear);
+                            }
+                        }
+                    }, year, month, day);
+                    mDatePicker.setTitle("Select Date");
+                    mDatePicker.show();
 
-                DatePickerDialog mDatePicker;
-                mDatePicker = new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int selectedYear, int selectedMonth, int selectedDay) {
-                        tvTimestampDatum.setText(selectedDay + "." + (selectedMonth+1) + "." + selectedYear);
-                    }
-                }, year, month, day);
-                mDatePicker.setTitle("Select Date");
-                mDatePicker.show();
+                    TimePickerDialog mTimePicker;
+                    mTimePicker = new TimePickerDialog(MainActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                            if (selectedHour < 10 || selectedMinute < 10) {
+                                if (selectedHour < 10 && selectedMinute >= 10) {
+                                    tvTimestampKommen.setText("0" + selectedHour + ":" + selectedMinute + ":00");
+                                }
+                                if (selectedMinute < 10 && selectedHour >= 10) {
+                                    tvTimestampKommen.setText(selectedHour + ":" + "0" + selectedMinute + ":00");
+                                }
+                                if (selectedHour < 10 && selectedMinute < 10) {
+                                    tvTimestampKommen.setText("0" + selectedHour + ":" + "0" + selectedMinute + ":00");
+                                }
+                            } else {
+                                tvTimestampKommen.setText(selectedHour + ":" + selectedMinute + ":00");
+                            }
+                        }
+                    }, hour, minute, true);//Yes 24 hour time
+                    mTimePicker.setTitle("Select Time");
 
-                TimePickerDialog mTimePicker;
-                mTimePicker = new TimePickerDialog(MainActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        tvTimestampKommen.setText(selectedHour + ":" + selectedMinute + ":00");
-
-                    }
-                }, hour, minute, true);//Yes 24 hour time
-                mTimePicker.setTitle("Select Time");
-
-                mTimePicker.show();
-
-                return true;
+                    mTimePicker.show();
+                    btnTimeStampPause.setEnabled(true);
+                    btnTimeStampGehen.setEnabled(true);
+                    btnTimeStampKommen.setEnabled(false);
+                    return true;
+                }
+                isKommen = false;
+                return false;
             }
         });
 
@@ -178,6 +208,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (isKommen == true) {
                     isGehen = true;
+                    try {
+                        dtCurrentTimeKommen = sdfDatumUhrzeit.parse(tvTimestampDatum + " " + tvTimestampKommen);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     dtCurrentTimeGehen = Calendar.getInstance().getTime();
                     strTime = sdfUhrzeit.format(dtCurrentTimeGehen);
                     tvTimestampGehen.setText(strTime);
