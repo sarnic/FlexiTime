@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                if (isKommen == false) {
+                if (!isKommen) {
                     isKommen = true;
                     dtCurrentTimeKommen = Calendar.getInstance().getTime();
                     strTime = sdfUhrzeit.format(dtCurrentTimeKommen);
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
          btnTimeStampKommen.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (isKommen == false) {
+                if (!isKommen) {
                     isKommen = true;
                     Calendar mcurrentTime = Calendar.getInstance();
                     int day = mcurrentTime.get(Calendar.DAY_OF_MONTH);
@@ -173,8 +173,8 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View view) {
-                if (isPauseEnde == false) {
-                    if (isPauseAnfang == true) {
+                if (!isPauseEnde) {
+                    if (isPauseAnfang) {
                         isPauseEnde = true;
                         dtCurrentTimePauseEnde = Calendar.getInstance().getTime();
                         strTime = sdfUhrzeit.format(dtCurrentTimePauseEnde);
@@ -206,10 +206,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                if (isKommen == true) {
+                if (isKommen) {
                     isGehen = true;
                     try {
-                        dtCurrentTimeKommen = sdfDatumUhrzeit.parse(tvTimestampDatum + " " + tvTimestampKommen);
+                        dtCurrentTimeKommen = sdfDatumUhrzeit.parse(tvTimestampDatum.getText() + " " + tvTimestampKommen.getText());
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
