@@ -215,12 +215,21 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (isKommen) {
                     isGehen = true;
+
                     try {
                         dtCurrentTimeKommen = sdfDatumUhrzeit.parse(tvTimestampDatum.getText() + " " + tvTimestampKommen.getText());
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
+
                     dtCurrentTimeGehen = Calendar.getInstance().getTime();
+
+                    try {
+                        dtCurrentTimeGehen = sdfDatumUhrzeit.parse(tvTimestampDatum.getText() + " " + sdfUhrzeit.format(dtCurrentTimeGehen));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
                     strTime = sdfUhrzeit.format(dtCurrentTimeGehen);
                     tvTimestampGehen.setText(strTime);
                     tvTimestampTotalzeitEnde.setText(strTime);
@@ -248,6 +257,9 @@ public class MainActivity extends AppCompatActivity {
 
                     if (plusminusInMillies < 0){
                         tvTimestampTotalPlusminus.setTextColor(Color.rgb(200,0,0));
+                    }
+                    if (plusminusInMillies > 0){
+                        tvTimestampTotalPlusminus.setTextColor(Color.rgb(0,200,0));
                     }
 
 
