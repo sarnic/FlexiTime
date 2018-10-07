@@ -30,14 +30,14 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    boolean isKommen, isPauseAnfang, isPauseEnde, isGehen;
+    boolean isKommen, isPauseAnfang, isPauseEnde, isGehen, isSave;
     long diffInMillies, plusminusInMillies;
-    Button btnExit, btnTimeStampKommen, btnTimeStampPause, btnTimeStampGehen;
+    Button btnExit, btnTimeStampKommen, btnTimeStampPause, btnTimeStampGehen, btnTimeStampSave;
     DigitalClock digitalClock;
-    TextView tvTimestampKommen, tvTimestampPauseAnfang, tvTimestampPauseEnde, tvTimestampPauseDifferenz, tvTimestampGehen, tvTimestampDatum, tvTimestampTotalzeitAnfang, tvTimestampTotalzeitEnde, tvTimestampTotalzeit, tvTimestampTotalPlusminus;
+    TextView tvTimestampKommen, tvTimestampPauseAnfang, tvTimestampPauseEnde, tvTimestampPauseDifferenz, tvTimestampGehen, tvTimestampDatum, tvTimestampTotalzeitAnfang, tvTimestampTotalzeitEnde, tvTimestampTotalzeit, tvTimestampTotalPlusminus, tvTimestampLoad;
     Date dtCurrentTimeKommen, dtCurrentTimeGehen, dtCurrentTimePauseAnfang, dtCurrentTimePauseEnde;
     SimpleDateFormat sdfDatumUhrzeit, sdfDatum, sdfUhrzeit;
-    String strDate, strTime, strDif;
+    String strDate, strTime, strDif, strSave;
     TimePicker picker;
 
 
@@ -51,8 +51,10 @@ public class MainActivity extends AppCompatActivity {
         isPauseAnfang = false;
         isPauseEnde = false;
         isGehen = false;
+        isSave = false;
         btnTimeStampPause.setEnabled(false);
         btnTimeStampGehen.setEnabled(false);
+        btnTimeStampSave.setEnabled(false);
         sdfDatumUhrzeit = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         sdfDatum = new SimpleDateFormat("dd.MM.yyyy");
         sdfUhrzeit = new SimpleDateFormat("HH:mm:ss");
@@ -264,6 +266,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                     btnTimeStampGehen.setEnabled(false);
+                    strSave = tvTimestampDatum.getText()+";"+tvTimestampKommen.getText()+";"+tvTimestampPauseAnfang.getText()+";"+tvTimestampPauseEnde.getText()+";"+tvTimestampPauseDifferenz.getText()+";"+tvTimestampGehen.getText()+";"+tvTimestampTotalzeit.getText()+";"+tvTimestampTotalPlusminus.getText();
+                    btnTimeStampSave.setEnabled(true);
                 }
             }
         });
@@ -285,8 +289,11 @@ public class MainActivity extends AppCompatActivity {
         btnTimeStampPause = findViewById(R.id.btn_timestamp_pause);
         btnTimeStampGehen = findViewById(R.id.btn_timestamp_gehen);
         btnExit = findViewById(R.id.btn_exit);
+        btnTimeStampSave = findViewById(R.id.btn_save);
+        tvTimestampLoad = findViewById(R.id.tv_timestamp_load);
 
     }
+
     /*
     public void read(View view) {
         try {
@@ -298,26 +305,52 @@ public class MainActivity extends AppCompatActivity {
             while ((lines=bufferedReader.readLine())!=null) {
                 stringBuffer.append(lines+"\n");
             }
-            textView.setText(stringBuffer.toString());
+            tvTimestampLoad.setText(stringBuffer.toString());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    */
 
-    public void write(View view) {
-        String Mytextmessage  = editText.getText().toString();
-        try {
-            FileOutputStream fileOutputStream = openFileOutput("myText.txt",MODE_PRIVATE);
-            fileOutputStream.write(Mytextmessage.getBytes());
-            fileOutputStream.close();
-            Toast.makeText(getApplicationContext(),"Text Saved",Toast.LENGTH_LONG).show();
-            editText.setText("");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void writeread(View view) {
+        //write
+        if(isSave == false) {
+            try {
+                FileOutputStream fileOutputStream = openFileOutput("myText.txt", MODE_PRIVATE);
+                fileOutputStream.write(strSave.getBytes());
+                fileOutputStream.close();
+                Toast.makeText(getApplicationContext(), "Text Saved: " + strSave, Toast.LENGTH_LONG).show();
+                //editText.setText("");
+                System.out.println("strSave: " + strSave);
+                isSave = true;
+                btnTimeStampSave.setText("Laden");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-    } */
+        //read
+        else {
+            try {
+                FileInputStream fileInputStream= openFileInput("myText.txt");
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuffer stringBuffer = new StringBuffer();
+                String lines;
+                while ((lines=bufferedReader.readLine())!=null) {
+                    stringBuffer.append(lines+"\n");
+                }
+                tvTimestampLoad.setText(stringBuffer.toString());
+                btnTimeStampSave.setEnabled(false);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

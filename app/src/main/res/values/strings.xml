@@ -10,4 +10,6 @@
     <string name="Platzhalter">XXXXXX</string>
     <string name="tv_timestamp_lblDate">Datum:</string>
     <string name="tv_timestamp_total">Total:</string>
+    <string name="zeitstempel_save">Speichern</string>
+    <string name="zeitstempel_load">Laden</string>
 </resources>
